@@ -1,0 +1,49 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local originalPosition
+local isUnderMap = false
+local platform
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ToggleUnderMapGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+gui.IgnoreGuiInset = true
+
+local button = Instance.new("TextButton")
+button.Parent = gui
+button.Size = UDim2.new(0, 200, 0, 50)
+button.Position = UDim2.new(0.5, 450, 0.03, 0)
+button.Text = "AutoFarm"
+button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+button.TextColor3 = Color3.fromRGB(0, 0, 255)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 22
+
+button.MouseButton1Click:Connect(function()
+	char = player.Character or player.CharacterAdded:Wait()
+	hrp = char:WaitForChild("HumanoidRootPart")
+	if not isUnderMap then
+		originalPosition = hrp.Position
+		hrp.CFrame = hrp.CFrame - Vector3.new(0, 100, 0)
+		platform = Instance.new("Part")
+		platform.Size = Vector3.new(20, 1, 20)
+		platform.Anchored = true
+		platform.Transparency = 1
+		platform.Position = hrp.Position - Vector3.new(0, 3, 0)
+		platform.Parent = workspace
+		button.Text = "NoAutoFarm"
+		isUnderMap = true
+	else
+		if originalPosition then
+			hrp.CFrame = CFrame.new(originalPosition)
+		end
+		if platform then
+			platform:Destroy()
+		end
+		button.Text = "AutoFarm"
+		isUnderMap = false
+	end
+end)
