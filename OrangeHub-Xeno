@@ -1,0 +1,64 @@
+-- Xeno Executor Friendly GUI Autofarm Toggle --
+
+local parentUI = (gethui and gethui()) or game.CoreGui
+
+-- Remove old GUI if exists
+pcall(function()
+    if parentUI:FindFirstChild("ToggleUnderMapGUI") then
+        parentUI:FindFirstChild("ToggleUnderMapGUI"):Destroy()
+    end
+end)
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local originalPosition
+local isUnderMap = false
+local platform
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ToggleUnderMapGUI"
+gui.Parent = parentUI
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 180, 0, 40)
+button.Position = UDim2.new(0, 15, 0, 15)
+button.Text = "AutoFarm"
+button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 22
+button.Parent = gui
+
+button.MouseButton1Click:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    if not isUnderMap then
+        originalPosition = hrp.Position
+        hrp.CFrame = hrp.CFrame - Vector3.new(0, 100, 0)
+
+        platform = Instance.new("Part")
+        platform.Size = Vector3.new(20, 1, 20)
+        platform.Anchored = true
+        platform.Transparency = 1
+        platform.CanCollide = true
+        platform.Position = hrp.Position - Vector3.new(0, 3, 0)
+        platform.Parent = workspace
+
+        button.Text = "StopFarm"
+        isUnderMap = true
+    else
+        if originalPosition then
+            hrp.CFrame = CFrame.new(originalPosition)
+        end
+        if platform then
+            platform:Destroy()
+        end
+
+        button.Text = "AutoFarm"
+        isUnderMap = false
+    end
+end)
