@@ -1,0 +1,48 @@
+-- JJSploit Friendly No-GUI Autofarm Toggle --
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local originalPosition
+local isUnderMap = false
+local platform
+
+local function toggleAutoFarm()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    if not isUnderMap then
+        originalPosition = hrp.Position
+        hrp.CFrame = hrp.CFrame - Vector3.new(0, 100, 0)
+
+        platform = Instance.new("Part")
+        platform.Size = Vector3.new(20, 1, 20)
+        platform.Anchored = true
+        platform.Transparency = 1
+        platform.CanCollide = true
+        platform.Position = hrp.Position - Vector3.new(0, 3, 0)
+        platform.Parent = workspace
+
+        isUnderMap = true
+        print("[AutoFarm] Enabled")
+    else
+        if originalPosition then
+            hrp.CFrame = CFrame.new(originalPosition)
+        end
+        if platform then
+            platform:Destroy()
+        end
+
+        isUnderMap = false
+        print("[AutoFarm] Disabled")
+    end
+end
+
+print("Type '!autofarm' in chat to toggle AutoFarm")
+
+-- Listen for chat command (works in JJSploit)
+player.Chatted:Connect(function(msg)
+    if msg:lower() == "!autofarm" then
+        toggleAutoFarm()
+    end
+end)
